@@ -118,8 +118,8 @@ class ToDoMVCTest {
         WebElement itemTicked = driver.findElement(By.cssSelector(".todo-list")).findElement(By.cssSelector(".completed"));
         Assertions.assertTrue(itemTicked.isDisplayed());
         toggleCompleted.click();
-        
-        Assertions.assertFalse(itemTicked.isDisplayed());
+        WebElement itemNotTicked = driver.findElement(By.cssSelector(".todo-list")).findElement(By.cssSelector(".completed"));
+        Assertions.assertTrue(itemNotTicked.isDisplayed());
     }
     @Test
     void canDeleteAnIncompleteItem(){

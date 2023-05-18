@@ -18,7 +18,7 @@ import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ToDoMVCTest {
+public class ToDoMVCTestTerry{
 
     private static ChromeDriver driver;
     private String todoMVCHomePage = "https://todomvc.com";
