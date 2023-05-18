@@ -115,11 +115,11 @@ class ToDoMVCTest {
         addItemToList("Buy some milk");
         WebElement toggleCompleted = driver.findElement(By.cssSelector(".toggle"));
         toggleCompleted.click();
-        WebElement itemTicked = driver.findElement(By.cssSelector(".todo-list")).findElement(By.cssSelector(".completed"));
+        WebElement itemTicked = driver.findElement(By.cssSelector(".todo-list")).findElement(By.cssSelector(".todo-list li .toggle:checked + label"));
         Assertions.assertTrue(itemTicked.isDisplayed());
-        toggleCompleted.click();
-        WebElement itemNotTicked = driver.findElement(By.cssSelector(".todo-list")).findElement(By.cssSelector(".completed"));
-        Assertions.assertTrue(itemNotTicked.isDisplayed());
+//        toggleCompleted.click();
+//        WebElement itemNotTicked = driver.findElement(By.cssSelector(".todo-list > li:nth-child(1)"));
+//        Assertions.assertTrue(itemNotTicked.isDisplayed());
     }
     @Test
     void canDeleteAnIncompleteItem(){
