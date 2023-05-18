@@ -9,6 +9,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.interactions.Actions;
 
 import java.time.Duration;
 
@@ -25,7 +26,7 @@ class ToDoMVCTest {
     }
 
     @BeforeEach
-    void launchBrowser() throws InterruptedException {
+    void launchBrowser(){
         driver = new ChromeDriver();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
         driver.get("https://todomvc.com");
@@ -34,20 +35,116 @@ class ToDoMVCTest {
     }
 
     @Test
-    void shouldPrintPageTitle() {
-        Assertions.assertEquals("React • TodoMVC", driver.getTitle());
+    void canAddItemWithSingleChar() {
+        addItemToList("a");
+        Assertions.assertEquals("a", viewList().getText());
     }
     @Test
-    void addSingleItem() {
+    void addSingleItem(){
         addItemToList("Buy some milk");
         Assertions.assertEquals("Buy some milk", viewList().getText());
     }
     @Test
-    void addMultipleItems() {
+    void addMultipleItems(){
         addItemToList("Buy some milk");
         addItemToList("Buy some bread");
         Assertions.assertEquals("Buy some milk\n" + "Buy some bread", viewList().getText());
     }
+    @Test
+    void canAddPunctuationToItems(){
+        addItemToList("!,.\"?");
+        Assertions.assertEquals("!,.\"?", viewList().getText());
+    }
+    @Test
+    void canAddSymbolsToItems(){
+        addItemToList("!@#%)*~-_");
+        Assertions.assertEquals("!@#%)*~-_", viewList().getText());
+    }
+    @Test
+    void canPasteExactly280Chars(){
+        WebElement newItemBox = driver.findElement(By.cssSelector(".new-todo"));
+        newItemBox.sendKeys("1907351270632232426197022048572973660634481260417686486815226421807238669338989435872373122098187294623512430603601827831968782065157279569698274712918255370234189985716572956062694627644718918726038719711447186608807680350024333838239554355378059448980408931313068845840028065549");
+        newItemBox.sendKeys(Keys.chord(Keys.COMMAND, "a"));
+        newItemBox.sendKeys(Keys.chord(Keys.COMMAND, "c"));
+        newItemBox.sendKeys(Keys.DELETE);
+        newItemBox.sendKeys(Keys.chord(Keys.COMMAND, "v"));
+        newItemBox.sendKeys(Keys.RETURN);
+        Assertions.assertEquals("1907351270632232426197022048572973660634481260417686486815226421807238669338989435872373122098187294623512430603601827831968782065157279569698274712918255370234189985716572956062694627644718918726038719711447186608807680350024333838239554355378059448980408931313068845840028065549", viewList().getText());
+    }
+    @Test
+    void canAddLanguageCharactersToItem(){
+        addItemToList("ẞ大本éñ");
+        Assertions.assertEquals("ẞ大本éñ", viewList().getText());
+    }
+    @Test
+    void canAddCurrencySymbolsToItem(){
+        addItemToList("$£¥€");
+        Assertions.assertEquals("$£¥€", viewList().getText());
+    }
+    @Test
+    void canModifyItemInList() {
+        Actions act = new Actions(driver);
+        addItemToList("Buy some milk");
+        WebElement currentItem = driver.findElement(By.cssSelector(".view > label"));
+        act.doubleClick(currentItem).perform();
+        driver.findElement(By.cssSelector(".edit")).sendKeys(Keys.chord(Keys.COMMAND, "a"));
+        driver.findElement(By.cssSelector(".edit")).sendKeys(Keys.DELETE);
+        driver.findElement(By.cssSelector(".edit")).sendKeys("Buy some bread");
+        driver.findElement(By.cssSelector(".edit")).sendKeys(Keys.ENTER);
+        Assertions.assertEquals("Buy some bread", viewList().getText());
+    }
+    @Test
+    void canCancelModifyItemInList() {
+        Actions act = new Actions(driver);
+        addItemToList("Buy some milk");
+        WebElement currentItem = driver.findElement(By.cssSelector(".view > label"));
+        act.doubleClick(currentItem).perform();
+        driver.findElement(By.cssSelector(".edit")).sendKeys(Keys.BACK_SPACE);
+        driver.findElement(By.cssSelector(".edit")).sendKeys(Keys.ESCAPE);
+        Assertions.assertEquals("Buy some milk", viewList().getText());
+    }
+    @Test
+    void canMarkItemAsComplete() {
+        addItemToList("Buy some milk");
+        driver.findElement(By.cssSelector(".toggle")).click();
+        WebElement itemTicked = driver.findElement(By.cssSelector(".todo-list")).findElement(By.cssSelector(".completed"));
+        Assertions.assertTrue(itemTicked.isDisplayed());
+    }
+    @Test
+    void canUncheckACompletedItem() throws InterruptedException {
+        addItemToList("Buy some milk");
+        WebElement toggleCompleted = driver.findElement(By.cssSelector(".toggle"));
+        toggleCompleted.click();
+        WebElement itemTicked = driver.findElement(By.cssSelector(".todo-list")).findElement(By.cssSelector(".completed"));
+        Assertions.assertTrue(itemTicked.isDisplayed());
+        toggleCompleted.click();
+        
+        Assertions.assertFalse(itemTicked.isDisplayed());
+    }
+    @Test
+    void canDeleteAnIncompleteItem(){
+        Actions act = new Actions(driver);
+        addItemToList("Buy some milk");
+        act.moveToElement(viewList()).perform();
+        WebElement deleteButton = driver.findElement(By.cssSelector(".destroy"));
+        deleteButton.click();
+        Assertions.assertEquals(0, driver.findElements(By.cssSelector("li:nth-child(1) label")).size());
+    }
+    @Test
+    void canDeleteACompletedItem(){
+        Actions act = new Actions(driver);
+        addItemToList("Buy some milk");
+        driver.findElement(By.cssSelector(".toggle")).click();
+        act.moveToElement(viewList()).perform();
+        WebElement deleteButton = driver.findElement(By.cssSelector(".destroy"));
+        deleteButton.click();
+        Assertions.assertEquals(0, driver.findElements(By.cssSelector("li:nth-child(1) label")).size());
+    }
+//    @Test //Test does not work, limitation of ChromeDriver. Won't accept emojis
+//    void canAddEmojiToItem(){
+//        addItemToList("\uD83D\uDE00");
+//        Assertions.assertEquals("\uD83D\uDE00", viewList().getText());
+//    }
 
     @AfterEach
     void quitBrowser(){driver.quit(); }
