@@ -315,6 +315,87 @@ public class ToDoMVCTestTerry{
         assertEquals(itemsActive + itemsCompleted, listItems.size());
     }
 
+    // ToDo item character limit
+    @Test
+    public void testTodoItemAcceptsTwoHundredFiftySixCharacters() {
+        navigateToPage(reactPage);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".new-todo")));
+        WebElement todoInput = driver.findElement(By.cssSelector(".new-todo"));
+        String strToInput = "";
+        for (int i = 0; i < 256; i++){
+            strToInput = strToInput + 'a';
+        }
+        todoInput.sendKeys(strToInput);
+        todoInput.sendKeys(Keys.ENTER);
+        WebElement itemsRemainingText = driver.findElement(By.cssSelector(".todo-count"));
+        assertEquals("1 item left", itemsRemainingText.getText());
+    }
+
+    // Clear Completed Link
+    @Test
+    public void testClearCompletedLinkInStatusBarWhenCompletedItemsPresent(){
+        navigateToPage(reactPage);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".new-todo")));
+        WebElement todoInput = driver.findElement(By.cssSelector(".new-todo"));
+        todoInput.sendKeys("First Todo");
+        todoInput.sendKeys(Keys.ENTER);
+        List<WebElement> clearCompletedTextItems = driver.findElements(By.cssSelector(".clear-completed"));
+        assertEquals(0, clearCompletedTextItems.size());
+        driver.findElement(By.cssSelector(".toggle")).click();
+        WebElement clearCompletedLink = driver.findElement(By.cssSelector(".clear-completed"));
+        assertTrue(clearCompletedLink.isDisplayed());
+        clearCompletedTextItems = driver.findElements(By.cssSelector(".clear-completed"));
+        assertEquals(1, clearCompletedTextItems.size());
+    }
+
+    @Test
+    public void testCompletedItemsClearWhenClearCompletedLinkClicked() {
+        navigateToPage(reactPage);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".new-todo")));
+        WebElement todoInput = driver.findElement(By.cssSelector(".new-todo"));
+        todoInput.sendKeys("First Todo");
+        todoInput.sendKeys(Keys.ENTER);
+        todoInput.sendKeys("Second Todo");
+        todoInput.sendKeys(Keys.ENTER);
+        WebElement itemsRemainingText = driver.findElement(By.cssSelector(".todo-count"));
+        assertEquals("2 items left", itemsRemainingText.getText());
+        List<WebElement> clearCompletedTextItems = driver.findElements(By.cssSelector(".clear-completed"));
+        assertEquals(0, clearCompletedTextItems.size());
+        List<WebElement> toggleItems = driver.findElements(By.cssSelector(".toggle"));
+        WebElement itemToClick = toggleItems.get(1);
+        itemToClick.click();
+        assertEquals("1 item left", itemsRemainingText.getText());
+        WebElement clearCompletedLink = driver.findElement(By.cssSelector(".clear-completed"));
+        assertTrue(clearCompletedLink.isDisplayed());
+        clearCompletedTextItems = driver.findElements(By.cssSelector(".clear-completed"));
+        assertEquals(1, clearCompletedTextItems.size());
+        clearCompletedLink.click();
+        clearCompletedTextItems = driver.findElements(By.cssSelector(".clear-completed"));
+        assertEquals(0, clearCompletedTextItems.size());
+    }
+
+    // Toggle all arrow
+    @Test
+    public void testToggleAllArrowTogglesAllItemsToCompleteWhenOriginallyIncomplete() {
+        navigateToPage(reactPage);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".new-todo")));
+        WebElement todoInput = driver.findElement(By.cssSelector(".new-todo"));
+        todoInput.sendKeys("First Todo");
+        todoInput.sendKeys(Keys.ENTER);
+        todoInput.sendKeys("Second Todo");
+        todoInput.sendKeys(Keys.ENTER);
+        List<WebElement> completedItems = driver.findElements(By.cssSelector(".completed"));
+        assertEquals(0, completedItems.size());
+        WebElement toggleAllArrow = driver.findElement(By.cssSelector(".main > label"));
+        toggleAllArrow.click();
+        completedItems = driver.findElements(By.cssSelector(".completed"));
+        assertEquals(2, completedItems.size());
+    }
+
     @AfterEach
     public void closeBrowser(){
         driver.quit();
