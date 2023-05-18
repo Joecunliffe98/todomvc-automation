@@ -1,9 +1,7 @@
 package todomvc.automation;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -28,8 +26,8 @@ public class ToDoMVCTestTerry{
         driver.get(webpage);
     }
 
-    @BeforeAll
-    static void launchBrowser(){
+    @BeforeEach
+    public void launchBrowser(){
         WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
     }
@@ -121,8 +119,8 @@ public class ToDoMVCTestTerry{
         assertEquals(0, driver.findElements(By.cssSelector("li:nth-child(1) label")).size());
     }
 
-    @AfterAll
-    static void closeBrowser(){
+    @AfterEach
+    public void closeBrowser(){
         driver.quit();
     }
 }
