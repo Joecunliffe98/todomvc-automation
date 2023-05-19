@@ -122,6 +122,38 @@ class ToDoMVCTest {
         Assertions.assertTrue(itemNotTicked.isDisplayed());
     }
     @Test
+    void statusBarShowsOneItemLeft(){
+        addItemToList("Buy some milk");
+        WebElement itemsLeft = driver.findElement((By.cssSelector(".todo-count")));
+        Assertions.assertEquals("1 item left", itemsLeft.getText());
+    }
+    @Test
+    void statusBarShowsTwoItemsLeft(){
+        addItemToList("Buy some milk");
+        addItemToList("Buy some bread");
+        WebElement itemsLeft = driver.findElement((By.cssSelector(".todo-count")));
+        Assertions.assertEquals("2 items left", itemsLeft.getText());
+    }
+    @Test
+    void statusBarShows99ItemsLeft(){
+        for(int i = 1; i<100; i++){
+           addItemToList("New item");
+        }
+        WebElement itemsLeft = driver.findElement((By.cssSelector(".todo-count")));
+        Assertions.assertEquals("99 items left", itemsLeft.getText());
+    }
+    @Test
+    void statusBarHides(){
+        Actions act = new Actions(driver);
+        addItemToList("Buy some milk");
+        WebElement itemsLeft = driver.findElement((By.cssSelector(".todo-count")));
+        Assertions.assertEquals("1 item left", itemsLeft.getText());
+        act.moveToElement(viewList()).perform();
+        WebElement deleteButton = driver.findElement(By.cssSelector(".destroy"));
+        deleteButton.click();
+        Assertions.assertEquals(0, driver.findElement(By.cssSelector(".filters")).getSize());
+    }
+    @Test
     void canDeleteAnIncompleteItem(){
         Actions act = new Actions(driver);
         addItemToList("Buy some milk");
