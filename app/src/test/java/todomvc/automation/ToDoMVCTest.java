@@ -10,8 +10,10 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.time.Duration;
+import java.util.function.BooleanSupplier;
 
 class ToDoMVCTest {
     private static ChromeDriver driver;
@@ -151,7 +153,7 @@ class ToDoMVCTest {
         act.moveToElement(viewList()).perform();
         WebElement deleteButton = driver.findElement(By.cssSelector(".destroy"));
         deleteButton.click();
-        Assertions.assertEquals(0, driver.findElement(By.cssSelector(".filters")).getSize());
+        Assertions.assertEquals(0, driver.findElements(By.cssSelector(".filters")).size());
     }
     @Test
     void canDeleteAnIncompleteItem(){
